@@ -1,5 +1,5 @@
-import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
+import { formatInStoreTz } from "@/lib/timezone";
 
 type WhatsAppBookingPayload = {
   shopName: string;
@@ -24,10 +24,10 @@ export function normalizeWhatsAppNumber(raw: string) {
 
 export function buildWhatsAppBookingUrl(payload: WhatsAppBookingPayload) {
   const phone = normalizeWhatsAppNumber(payload.whatsappNumber);
-  const tanggal = format(payload.startAt, "EEEE, d MMMM yyyy", {
+  const tanggal = formatInStoreTz(payload.startAt, "EEEE, d MMMM yyyy", {
     locale: localeId,
   });
-  const jam = `${format(payload.startAt, "HH:mm")}–${format(payload.endAt, "HH:mm")}`;
+  const jam = `${formatInStoreTz(payload.startAt, "HH:mm")}–${formatInStoreTz(payload.endAt, "HH:mm")}`;
 
   const lines = [
     `Halo ${payload.shopName}!`,
@@ -38,7 +38,7 @@ export function buildWhatsAppBookingUrl(payload: WhatsAppBookingPayload) {
     `WA: ${payload.customerPhone}`,
     `Room: ${payload.roomName}`,
     `Tanggal: ${tanggal}`,
-    `Jam: ${jam}`,
+    `Jam: ${jam} (WITA)`,
   ];
 
   if (payload.durationHours && payload.durationHours > 1) {

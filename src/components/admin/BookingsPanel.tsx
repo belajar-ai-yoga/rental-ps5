@@ -29,6 +29,7 @@ const statusLabel: Record<string, string> = {
 
 function formatDateTime(iso: string) {
   return new Date(iso).toLocaleString("id-ID", {
+    timeZone: "Asia/Makassar",
     day: "numeric",
     month: "short",
     hour: "2-digit",
@@ -92,11 +93,20 @@ export function BookingsPanel({
   function openMove(booking: BookingRow) {
     const start = new Date(booking.startAt);
     const end = new Date(booking.endAt);
-    const dayKey = `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, "0")}-${String(start.getDate()).padStart(2, "0")}`;
+    const dayKey = start.toLocaleDateString("en-CA", {
+      timeZone: "Asia/Makassar",
+    });
+    const hour = Number(
+      new Intl.DateTimeFormat("en-GB", {
+        timeZone: "Asia/Makassar",
+        hour: "numeric",
+        hourCycle: "h23",
+      }).format(start),
+    );
     setMovingId(booking.id);
     setMoveRoomId(booking.roomId);
     setMoveDay(dayKey);
-    setMoveHour(start.getHours());
+    setMoveHour(hour);
     setMoveDuration(
       Math.max(1, Math.round((end.getTime() - start.getTime()) / 3600000)),
     );

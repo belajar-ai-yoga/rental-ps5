@@ -1,16 +1,14 @@
-import {
-  addDays,
-  addHours,
-  format,
-  isBefore,
-  startOfDay,
-  setHours,
-  setMinutes,
-  setSeconds,
-  setMilliseconds,
-} from "date-fns";
+import { addDays, addHours, isBefore } from "date-fns";
 import { id as localeId } from "date-fns/locale";
 import { toInitials } from "@/lib/privacy";
+import {
+  formatInStoreTz,
+  startOfStoreDay,
+  storeDayKey,
+  storeHour,
+  zonedDateTime,
+  isSameStoreDay,
+} from "@/lib/timezone";
 
 export type DayOption = {
   key: string;
@@ -43,33 +41,40 @@ const BOOKING_SLOT_LABEL: Record<string, string> = {
   active: "Terisi",
 };
 
-export function bookingLabelForStatus(status: string, isStart: boolean, customerName?: string) {
+export function bookingLabelForStatus(
+  status: string,
+  isStart: boolean,
+  customerName?: string,
+) {
   const base = BOOKING_SLOT_LABEL[status] ?? "Terisi";
   if (isStart && customerName) return `${base} · ${toInitials(customerName)}`;
   return base;
 }
 
 export function buildHourSlots(
-  day: Date,
+  dayKeyOrDate: string | Date,
   openHour: number,
   closeHour: number,
   bookings: SlotBooking[],
   now = new Date(),
   allowCurrentHourForAdmin = false,
 ): HourSlot[] {
-  const dayStart = startOfLocalDay(day);
+  const dayKey =
+    typeof dayKeyOrDate === "string"
+      ? dayKeyOrDate
+      : storeDayKey(dayKeyOrDate);
+
   const slots: HourSlot[] = [];
+  const nowHour = storeHour(now);
+  const nowDayKey = storeDayKey(now);
 
   for (let hour = openHour; hour < closeHour; hour += 1) {
-    const startAt = setMilliseconds(
-      setSeconds(setMinutes(setHours(dayStart, hour), 0), 0),
-      0,
-    );
+    const startAt = zonedDateTime(dayKey, hour);
     const endAt = addHours(startAt, 1);
     const isCurrentHour =
       allowCurrentHourForAdmin &&
-      hour === now.getHours() &&
-      startAt.toDateString() === now.toDateString();
+      hour === nowHour &&
+      dayKey === nowDayKey;
     const past = isCurrentHour ? false : isBefore(startAt, now);
 
     const covering = bookings.find((booking) => {
@@ -81,7 +86,7 @@ export function buildHourSlots(
 
     slots.push({
       hour,
-      label: `${format(startAt, "HH:mm")}–${format(endAt, "HH:mm")}`,
+      label: `${formatInStoreTz(startAt, "HH:mm")}–${formatInStoreTz(endAt, "HH:mm")}`,
       startAt,
       endAt,
       available: !past && !covering,
@@ -129,21 +134,24 @@ export function canBookDuration(
   return true;
 }
 
+/** @deprecated gunakan startOfStoreDay — alias kompatibilitas */
 export function startOfLocalDay(date = new Date()) {
-  return startOfDay(date);
+  return startOfStoreDay(date);
 }
 
 export function getBookableDays(windowDays = 3, from = new Date()): DayOption[] {
   const labels = ["Hari ini", "Besok", "Lusa"];
-  const base = startOfLocalDay(from);
+  const baseKey = storeDayKey(from);
+  const base = zonedDateTime(baseKey, 0);
 
   return Array.from({ length: windowDays }, (_, index) => {
     const date = addDays(base, index);
+    const key = storeDayKey(date);
     return {
-      key: format(date, "yyyy-MM-dd"),
-      label: labels[index] ?? format(date, "EEEE", { locale: localeId }),
-      dateLabel: format(date, "d MMM", { locale: localeId }),
-      date,
+      key,
+      label: labels[index] ?? formatInStoreTz(date, "EEEE", { locale: localeId }),
+      dateLabel: formatInStoreTz(date, "d MMM", { locale: localeId }),
+      date: startOfStoreDay(date),
     };
   });
 }
@@ -153,23 +161,25 @@ export function isDateInBookingWindow(
   windowDays = 3,
   from = new Date(),
 ) {
-  const target = startOfLocalDay(date).getTime();
-  const min = startOfLocalDay(from).getTime();
-  const max = addDays(startOfLocalDay(from), windowDays - 1).getTime();
-  return target >= min && target <= max;
+  const targetKey = storeDayKey(date);
+  const minKey = storeDayKey(from);
+  const maxDate = addDays(startOfStoreDay(from), windowDays - 1);
+  const maxKey = storeDayKey(maxDate);
+  return targetKey >= minKey && targetKey <= maxKey;
 }
 
 export function parseDayKey(dayKey: string) {
-  const [year, month, day] = dayKey.split("-").map(Number);
-  if (!year || !month || !day) return null;
-  return new Date(year, month - 1, day, 0, 0, 0, 0);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dayKey)) return null;
+  return zonedDateTime(dayKey, 0);
 }
 
 export function slotDateFromDayAndHour(dayKey: string, hour: number) {
-  const day = parseDayKey(dayKey);
-  if (!day) return null;
-  return setMilliseconds(setSeconds(setMinutes(setHours(day, hour), 0), 0), 0);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dayKey)) return null;
+  if (Number.isNaN(hour) || hour < 0 || hour > 23) return null;
+  return zonedDateTime(dayKey, hour);
 }
+
+export { isSameStoreDay, storeDayKey, storeHour };
 
 export function generateBookingCode() {
   const now = Date.now().toString(36).toUpperCase();

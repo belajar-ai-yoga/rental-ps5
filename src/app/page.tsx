@@ -1,10 +1,15 @@
-import Link from "next/link";
-import { BookingExperience } from "@/components/customer/BookingExperience";
 import { expireStalePendingBookings, PUBLIC_SLOT_STATUSES } from "@/lib/booking-policy";
-import { buildHourSlots, getBookableDays, startOfLocalDay } from "@/lib/booking-window";
+import {
+  buildHourSlots,
+  getBookableDays,
+  startOfLocalDay,
+} from "@/lib/booking-window";
 import { prisma } from "@/lib/prisma";
 import { resolveDayAvailability } from "@/lib/room-availability";
 import { getSettings } from "@/lib/settings";
+import { endOfStoreDay } from "@/lib/timezone";
+import Link from "next/link";
+import { BookingExperience } from "@/components/customer/BookingExperience";
 
 export const dynamic = "force-dynamic";
 
@@ -13,8 +18,7 @@ export default async function HomePage() {
 
   const settings = await getSettings();
   const today = startOfLocalDay();
-  const dayEnd = new Date(today);
-  dayEnd.setHours(23, 59, 59, 999);
+  const dayEnd = endOfStoreDay();
 
   const rooms = await prisma.room.findMany({
     where: { isActive: true },

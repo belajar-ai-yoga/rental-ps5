@@ -6,6 +6,7 @@ import {
   PUBLIC_SLOT_STATUSES,
 } from "@/lib/booking-policy";
 import { buildHourSlots, startOfLocalDay } from "@/lib/booking-window";
+import { endOfStoreDay } from "@/lib/timezone";
 import { prisma } from "@/lib/prisma";
 import { resolveDayAvailability } from "@/lib/room-availability";
 import { resolveRoomStatus } from "@/lib/room-status";
@@ -21,8 +22,7 @@ export async function GET(request: Request) {
 
   const settings = await getSettings();
   const today = startOfLocalDay();
-  const dayEnd = new Date(today);
-  dayEnd.setHours(23, 59, 59, 999);
+  const dayEnd = endOfStoreDay();
 
   const rooms = await prisma.room.findMany({
     where: isAdmin && all ? undefined : { isActive: true },

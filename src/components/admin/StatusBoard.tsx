@@ -33,6 +33,7 @@ const badge: Record<RoomLiveStatus, string> = {
 
 function formatTime(iso: string) {
   return new Date(iso).toLocaleTimeString("id-ID", {
+    timeZone: "Asia/Makassar",
     hour: "2-digit",
     minute: "2-digit",
   });

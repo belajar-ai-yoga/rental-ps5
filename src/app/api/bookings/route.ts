@@ -21,6 +21,7 @@ import { prisma } from "@/lib/prisma";
 import { overlaps } from "@/lib/room-status";
 import { getSettings } from "@/lib/settings";
 import { buildWhatsAppBookingUrl } from "@/lib/whatsapp";
+import { endOfStoreDay, startOfStoreDay } from "@/lib/timezone";
 
 export async function GET(request: Request) {
   await expireStalePendingBookings();
@@ -33,11 +34,8 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const filter = searchParams.get("filter") ?? "today";
 
-  const now = new Date();
-  const startToday = new Date(now);
-  startToday.setHours(0, 0, 0, 0);
-  const endToday = new Date(now);
-  endToday.setHours(23, 59, 59, 999);
+  const startToday = startOfStoreDay();
+  const endToday = endOfStoreDay();
 
   const where =
     filter === "pending"

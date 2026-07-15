@@ -5,6 +5,7 @@ import { expireStalePendingBookings } from "@/lib/booking-policy";
 import { getBookableDays } from "@/lib/booking-window";
 import { prisma } from "@/lib/prisma";
 import { getSettings } from "@/lib/settings";
+import { endOfStoreDay, startOfStoreDay } from "@/lib/timezone";
 
 export const dynamic = "force-dynamic";
 
@@ -12,11 +13,8 @@ export default async function AdminBookingsPage() {
   await expireStalePendingBookings();
 
   const settings = await getSettings();
-  const now = new Date();
-  const startToday = new Date(now);
-  startToday.setHours(0, 0, 0, 0);
-  const endToday = new Date(now);
-  endToday.setHours(23, 59, 59, 999);
+  const startToday = startOfStoreDay();
+  const endToday = endOfStoreDay();
 
   const [bookings, rooms] = await Promise.all([
     prisma.booking.findMany({

@@ -13,6 +13,7 @@ import {
 } from "@/lib/booking-window";
 import { prisma } from "@/lib/prisma";
 import { getSettings } from "@/lib/settings";
+import { endOfStoreDay } from "@/lib/timezone";
 
 export async function GET(request: Request) {
   await expireStalePendingBookings();
@@ -51,8 +52,7 @@ export async function GET(request: Request) {
   }
 
   const dayStart = day;
-  const dayEnd = new Date(day);
-  dayEnd.setHours(23, 59, 59, 999);
+  const dayEnd = endOfStoreDay(day);
 
   // Customer: hanya confirmed/active. Admin: termasuk pending agar kasir lihat antrian.
   const statusFilter = admin
@@ -69,7 +69,7 @@ export async function GET(request: Request) {
   });
 
   const slots = buildHourSlots(
-    day,
+    dayKey,
     settings.openHour,
     settings.closeHour,
     bookings.map((b) => ({

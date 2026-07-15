@@ -10,6 +10,8 @@ import {
   generateBookingCode,
   isDateInBookingWindow,
   slotDateFromDayAndHour,
+  storeDayKey,
+  storeHour,
 } from "@/lib/booking-window";
 import { prisma } from "@/lib/prisma";
 import { overlaps } from "@/lib/room-status";
@@ -69,8 +71,7 @@ export async function POST(request: Request) {
 
   const now = new Date();
   const isCurrentHour =
-    now.getHours() === hour &&
-    startAt.toDateString() === now.toDateString();
+    storeHour(now) === hour && storeDayKey(now) === dayKey;
 
   if (startAt < now && !(mode === "active" && isCurrentHour)) {
     return NextResponse.json(
