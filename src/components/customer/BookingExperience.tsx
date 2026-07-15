@@ -13,6 +13,7 @@ type RoomCard = {
   id: string;
   name: string;
   consoleType: string;
+  pricePerHour: number;
   availability: RoomAvailability;
   availabilityLabel: string;
   availableSlotsToday: number;
@@ -35,7 +36,6 @@ type Slot = {
 
 type Settings = {
   shopName: string;
-  pricePerHour: number;
   bookingWindowDays: number;
   openHour: number;
   closeHour: number;
@@ -116,6 +116,7 @@ export function BookingExperience({
                 id: room.id,
                 name: room.name,
                 consoleType: room.consoleType,
+                pricePerHour: room.pricePerHour,
                 availability: room.availability,
                 availabilityLabel: room.availabilityLabel,
                 availableSlotsToday: room.availableSlotsToday,
@@ -209,6 +210,7 @@ export function BookingExperience({
             id: room.id,
             name: room.name,
             consoleType: room.consoleType,
+            pricePerHour: room.pricePerHour,
             availability: room.availability,
             availabilityLabel: room.availabilityLabel,
             availableSlotsToday: room.availableSlotsToday,
@@ -232,7 +234,8 @@ export function BookingExperience({
     }
   }
 
-  const estimatedTotal = settings.pricePerHour * durationHours;
+  const estimatedTotal =
+    (selectedRoom?.pricePerHour ?? 0) * durationHours;
 
   return (
     <div className="relative overflow-hidden">
@@ -314,6 +317,9 @@ export function BookingExperience({
               <p className="mt-2 text-xs tracking-wide text-mist/60 uppercase">
                 {room.consoleType}
               </p>
+              <p className="mt-1 text-sm text-lime/90">
+                {formatCurrency(room.pricePerHour)} / jam
+              </p>
               {room.availability !== "penuh" && (
                 <p className="mt-2 text-xs text-mist/70">
                   Sisa {room.availableSlotsToday} slot hari ini
@@ -334,8 +340,8 @@ export function BookingExperience({
               Booking Slot
             </h2>
             <p className="mt-1 text-mist/70">
-              Tersedia {settings.bookingWindowDays} hari ke depan ·{" "}
-              {formatCurrency(settings.pricePerHour)} / jam
+              Tersedia {settings.bookingWindowDays} hari ke depan · tarif
+              tergantung room yang dipilih
             </p>
           </div>
 
@@ -385,6 +391,9 @@ export function BookingExperience({
                   >
                     <div className="font-medium">{room.name}</div>
                     <div className="text-xs opacity-70">{room.consoleType}</div>
+                    <div className="mt-1 text-xs text-lime/80">
+                      {formatCurrency(room.pricePerHour)}/jam
+                    </div>
                   </button>
                 );
               })}

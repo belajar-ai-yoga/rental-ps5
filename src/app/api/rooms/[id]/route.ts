@@ -19,6 +19,7 @@ export async function PATCH(request: Request, { params }: Params) {
     consoleType?: string;
     isActive?: boolean;
     sortOrder?: number;
+    pricePerHour?: number;
   } = {};
 
   if (body.name !== undefined) data.name = String(body.name).trim();
@@ -27,6 +28,9 @@ export async function PATCH(request: Request, { params }: Params) {
   }
   if (body.isActive !== undefined) data.isActive = Boolean(body.isActive);
   if (body.sortOrder !== undefined) data.sortOrder = Number(body.sortOrder);
+  if (body.pricePerHour !== undefined) {
+    data.pricePerHour = Math.max(0, Number(body.pricePerHour));
+  }
 
   if (data.name !== undefined && !data.name) {
     return NextResponse.json({ error: "Nama room wajib diisi" }, { status: 400 });

@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Room" ADD COLUMN "pricePerHour" INTEGER NOT NULL DEFAULT 25000;

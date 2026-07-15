@@ -8,7 +8,7 @@ import { useState } from "react";
 export default function AdminLoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("admin@rentalps.local");
-  const [password, setPassword] = useState("admin123");
+  const [password, setPassword] = useState("admin05");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 

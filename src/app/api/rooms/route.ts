@@ -66,6 +66,7 @@ export async function GET(request: Request) {
       id: room.id,
       name: room.name,
       consoleType: room.consoleType,
+      pricePerHour: room.pricePerHour,
       isActive: room.isActive,
       sortOrder: room.sortOrder,
       status,
@@ -97,6 +98,7 @@ export async function POST(request: Request) {
   const body = await request.json();
   const name = String(body.name ?? "").trim();
   const consoleType = String(body.consoleType ?? "PS5").trim() || "PS5";
+  const pricePerHour = Math.max(0, Number(body.pricePerHour ?? 25000));
 
   if (!name) {
     return NextResponse.json({ error: "Nama room wajib diisi" }, { status: 400 });
@@ -107,6 +109,7 @@ export async function POST(request: Request) {
     data: {
       name,
       consoleType,
+      pricePerHour,
       sortOrder: (maxOrder._max.sortOrder ?? 0) + 1,
       isActive: true,
     },

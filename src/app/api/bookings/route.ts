@@ -200,7 +200,7 @@ export async function POST(request: Request) {
     startAt: booking.startAt,
     endAt: booking.endAt,
     durationHours,
-    pricePerHour: settings.pricePerHour,
+    pricePerHour: booking.room.pricePerHour,
   });
 
   return NextResponse.json(

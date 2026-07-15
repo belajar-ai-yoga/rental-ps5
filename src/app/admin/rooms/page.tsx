@@ -19,6 +19,7 @@ export default async function AdminRoomsPage() {
     id: room.id,
     name: room.name,
     consoleType: room.consoleType,
+    pricePerHour: room.pricePerHour,
     isActive: room.isActive,
     status: resolveRoomStatus(room.bookings).status,
   }));

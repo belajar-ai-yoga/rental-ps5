@@ -105,7 +105,7 @@ Atau di Vercel → Project → Settings → bisa pakai one-off, tapi paling muda
 
 Login admin default:
 - Email: `admin@rentalps.local`
-- Password: `admin123`
+- Password: `admin05`
 
 **Ganti password & nomor WA** di Admin → Setting setelah online.
 

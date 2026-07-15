@@ -11,6 +11,7 @@ model Room {
   id          String    @id @default(cuid())
   name        String
   consoleType String    @default("PS5")
+  pricePerHour Int      @default(25000)
   isActive    Boolean   @default(true)
   sortOrder   Int       @default(0)
   createdAt   DateTime  @default(now())

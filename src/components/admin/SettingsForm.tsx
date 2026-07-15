@@ -133,7 +133,7 @@ export function SettingsForm({ initial }: { initial: Settings }) {
         </label>
         <label className="block">
           <span className="mb-1 block text-sm font-medium text-slate-600">
-            Harga / Jam (Rp)
+            Tarif default room baru (Rp/jam)
           </span>
           <input
             type="number"

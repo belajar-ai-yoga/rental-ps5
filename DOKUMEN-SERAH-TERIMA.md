@@ -45,7 +45,7 @@ npm start
 | Field | Nilai |
 |-------|--------|
 | Email | `admin@rentalps.local` |
-| Password | `admin123` |
+| Password | `admin05` |
 
 **Wajib diganti** sebelum dipakai publik. Nomor WhatsApp admin juga wajib diubah di **Admin → Setting**.
 

@@ -50,6 +50,7 @@ export default async function HomePage() {
       id: room.id,
       name: room.name,
       consoleType: room.consoleType,
+      pricePerHour: room.pricePerHour,
       availability: availabilityInfo.availability,
       availabilityLabel: availabilityInfo.label,
       availableSlotsToday: availabilityInfo.availableCount,
@@ -83,7 +84,6 @@ export default async function HomePage() {
         initialDays={days}
         settings={{
           shopName: settings.shopName,
-          pricePerHour: settings.pricePerHour,
           bookingWindowDays: settings.bookingWindowDays,
           openHour: settings.openHour,
           closeHour: settings.closeHour,

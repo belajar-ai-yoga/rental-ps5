@@ -30,7 +30,7 @@ Buka [http://localhost:3000](http://localhost:3000)
 ### Login admin (seed)
 
 - Email: `admin@rentalps.local`
-- Password: `admin123`
+- Password: `admin05`
 
 ## Deploy Vercel + Neon
 
