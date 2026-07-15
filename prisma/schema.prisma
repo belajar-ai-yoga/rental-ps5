@@ -1,0 +1,56 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Room {
+  id          String    @id @default(cuid())
+  name        String
+  consoleType String    @default("PS5")
+  isActive    Boolean   @default(true)
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  bookings    Booking[]
+}
+
+model Booking {
+  id            String   @id @default(cuid())
+  code          String   @unique
+  roomId        String
+  room          Room     @relation(fields: [roomId], references: [id])
+  customerName  String
+  customerPhone String
+  startAt       DateTime
+  endAt         DateTime
+  status        String   @default("pending")
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([roomId, startAt, endAt])
+  @@index([status])
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String   @default("Admin")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Settings {
+  id                Int    @id @default(1)
+  whatsappNumber    String @default("6281234567890")
+  openHour          Int    @default(10)
+  closeHour         Int    @default(22)
+  bookingWindowDays Int    @default(3)
+  pricePerHour      Int    @default(25000)
+  shopName          String @default("Rental PS Arena")
+}
